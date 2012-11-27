@@ -1,0 +1,31 @@
+html, body
+{
+   	margin: 5px;
+}
+
+canvas
+{
+  	background-color: #DDDDDD;
+  	margin: 		  50px;
+}
+
+td
+{
+	padding: 10px;
+}
+
+.demo
+{
+	top:   10px;
+}
+
+.td-slider
+{
+	width: 260px;
+}
+
+.sliders{
+	left: 	  150px;
+	width:	  260px; 
+	margin:   15px;
+}
