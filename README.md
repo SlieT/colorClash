@@ -85,8 +85,10 @@ To-do
 
 Notice
 ------
+- demo.js contains the slider-demo and a commented version of the widget
+
 - don't change the canvas-size via css change it through the widget (to contain
-		the right proportion)!
+		the right proportion of the image on canvas)!
 
 - everything that works correctly gets added to the undo-function.
 
@@ -98,7 +100,7 @@ Bugs
 		isn't visible nether (it seems like after some refreshes the images are cached 
 		and therefore it works).
 
-- when viewing the index.html in Chrome throws some errors (don't even know what its 
+- viewing the index.html in Chrome throws some errors (don't even know what its 
     doing in Safari).
 
 
