@@ -5,8 +5,8 @@ $(function () {
         img:                ["img/Plant.jpg", 800, 480],
         //temperature:        300,
         //horizontal:         true,
-        //canvasWidthExt:     -100,
-        //canvasHeightExt:    100,
+        canvasExt:          [200, 200],
+        moveImg:            [100, 50],
         undo_cb: function(event, ui) {
             //console.log("do something after an undo was performend");
             if (ui.name === "red") {
@@ -162,8 +162,40 @@ $(function () {
         //console.log($( '#kannwas' ).colorClash("option", "img"));
     });
 
-});
 
+    var element = $( "#kannwas" ),
+        newMoveX = 0, newMoveY = 0, distImgToMouseX = 0, distImgToMouseY = 0;
+
+    $( "#Drag" ).click(function () {
+        if (this.value === "Enable Drag") {
+            element.mousedown(function(e) {
+
+               distImgToMouseX = e.pageX - ( element.offset().left + $( "#kannwas" ).colorClash("option", "moveImg")[0] );
+               distImgToMouseY = e.pageY - ( element.offset().top + $( "#kannwas" ).colorClash("option", "moveImg")[1] );
+               //console.log(distImgToMouseX, distImgToMouseY);
+
+                element.mousemove(function(e) {
+                    newMoveX = e.pageX - ( element.offset().left + distImgToMouseX );
+                    newMoveY = e.pageY - ( element.offset().top + distImgToMouseY );
+                    //console.log(newMoveX, newMoveY);
+                    $( "#kannwas" ).colorClash("option", "moveImg", [newMoveX, newMoveY]);
+                    element.mouseup(function(e) {
+                        element.unbind('mousemove');
+                    });
+                });
+        
+
+            });
+            this.value = "Disable Drag";
+            //console.log($( '#kannwas' ).colorClash("option", "moveImg"));
+        } else {
+            element.unbind('mousedown');
+            element.unbind('mousemove');
+            element.unbind('mouseup ');
+            this.value = "Enable Drag";
+        }
+    });
+});
 
 
 (function ($) {
@@ -184,8 +216,9 @@ $(function () {
             undo:               false,
             imageData:          null,
             img:                null,
-            canvasWidthExt:     0,
-            canvasHeightExt:    0,
+            canvasExt:          null,
+            moveImg:            null,
+
             // callbacks
             create_cb:          null,
             undo_cb:            null,
@@ -227,13 +260,16 @@ $(function () {
 
             var self = this;
             tempImg.load( function() {
-                self.variables.canvas.width  = self.variables.imgWidth  + self.options.canvasWidthExt;
-                self.variables.canvas.height = self.variables.imgHeight + self.options.canvasHeightExt;
-                self.variables.canvasContext.drawImage(tempImg[0], 0, 0);
+                self.variables.canvas.width  = self.variables.imgWidth  + self.options.canvasExt[0];
+                self.variables.canvas.height = self.variables.imgHeight + self.options.canvasExt[1];
+                self.variables.canvasContext.
+                    drawImage(tempImg[0], 0 + self.options.moveImg[0], 0 + self.options.moveImg[1]);
     
                 // get the imagedata
-                self.variables.originalImageData = self.variables.canvasContext.getImageData(0, 0, self.variables.imgWidth, self.variables.imgHeight);
-                self.options.imageData = self.variables.canvasContext.getImageData(0, 0, self.variables.imgWidth, self.variables.imgHeight);
+                self.variables.originalImageData = self.variables.canvasContext.
+                    getImageData(0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.variables.imgWidth, self.variables.imgHeight);
+                self.options.imageData = self.variables.canvasContext.
+                    getImageData(0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.variables.imgWidth, self.variables.imgHeight);
     
                 self._flipImg();
                 self._manipulateImg();
@@ -245,35 +281,43 @@ $(function () {
         // Use the _setOption method to respond to changes to options
         _setOption: function (key, value) {
         ////////////////////
+            var manipulate = false;
             switch (key) {
                 case "red":
                     this.variables.undoArray.push("red", this.options.red);
+                    manipulate = true;
                     //console.log("red");
                     break;
                 case "green":
                     this.variables.undoArray.push("green", this.options.green);
+                    manipulate = true;
                     //console.log("green");
                     break;
                 case "blue":
                     this.variables.undoArray.push("blue", this.options.blue);
+                    manipulate = true;
                     //console.log("blue");
                     break;
                 case "lighten":
                     this.variables.undoArray.push("lighten", this.options.lighten);
+                    manipulate = true;
                     //console.log("lighten");
                     break;
                 case "saturate":
                     if (value > 1) { value = 1; }
                         else if (value < 0) { value = 0; }
                         this.variables.undoArray.push("saturate", this.options.saturate);
+                        manipulate = true;
                         //console.log("saturate");
                     break;
                 case "temperature":
                     this.variables.undoArray.push("temperature", this.options.temperature);
+                    manipulate = true;
                     //console.log("temperature");
                     break;
                 case "coloring":
                     this.variables.undoArray.push("coloring", this.options.coloring);
+                    manipulate = true;
                     //console.log("coloring");
                     break;
                 case "vertical":
@@ -296,6 +340,7 @@ $(function () {
                     return;
                 case "undo":
                     this.undo(value);
+                    manipulate = true;
                     //console.log("undo");
                     break;
                 case "imageData":
@@ -304,25 +349,42 @@ $(function () {
                     if (value !== undefined) {
                         return;
                     }
+                    manipulate = true;
                     break;
                 case "img":
                     this.variables.undoArray.push("img", this.options.img);
                     this._img(value);
+                    manipulate = true;
                     //console.log("imgSrc");
                     break;
-                case "canvasWidthExt":
-                    if (value < 0 && this.variables.imgWidth - (-1 * value) < 0 ) { value = -1 * this.variables.imgWidth; }
-                    this.variables.canvas.width  = this.variables.imgWidth  + value;
-                    //console.log("canvasWidthExt");
+                case "canvasExt":
+                    // if the extension is smaller than the width/height of the canvas the
+                    // canvasExt-array contains the values [-imgWidth, -imgHeight]
+                    if (value[0] < 0 && this.variables.imgWidth - (-1 * value[0]) < 0 ) { value[0] = -1 * this.variables.imgWidth; }
+                    this.variables.canvas.width  = this.variables.imgWidth  + value[0];
+                    if (value[1] < 0 && this.variables.imgHeight - (-1 * value[1]) < 0 ) { value[1] = -1 * this.variables.imgHeight; }
+                    this.variables.canvas.height = this.variables.imgHeight  + value[1];
+                    //console.log("canvasExt");
                     break;
-                case "canvasHeightExt":
-                    if (value < 0 && this.variables.imgHeight - (-1 * value) < 0 ) { value = -1 * this.variables.imgHeight; }
-                    this.variables.canvas.height = this.variables.imgHeight  + value;
-                    //console.log("canvasHeightExt");
+                case "moveImg":
+                    // move an image by absolute positioning, no negative values possible
+                    if (value[0] < 0) { value[0] = 0; }
+                    if (value[0] > 0 && value[0] + this.variables.imgWidth > this.variables.canvas.width) {
+                        value[0] = this.variables.canvas.width - this.variables.imgWidth; }
+                       
+                    if (value[1] < 0) { value[1] = 0; }
+                    if (value[1] > 0 && value[1] + this.variables.imgHeight > this.variables.canvas.height) {
+                        value[1] = this.variables.canvas.height - this.variables.imgHeight; }
+
+                    this.variables.canvasContext.clearRect(0, 0, this.variables.canvas.width, this.variables.canvas.height);
+                    this.variables.canvasContext.putImageData(this.options.imageData, 0 + value[0], 0 + value[1]);
+                    //console.log("moveImg");
                     break;
             }
             $.Widget.prototype._setOption.apply(this, arguments);
-            this._manipulateImg();
+            if (manipulate === true) {
+                this._manipulateImg();
+            }
         },
 
         // Undo last action - everything that you can undo should work correctly
@@ -458,7 +520,8 @@ $(function () {
                 tempImageData_data[countOfPixels + 2] = greyscaleIntensity * (1 - tempSaturate) + newB * tempSaturate;
             }
             this.options.imageData.data = tempImageData_data;
-            this.variables.canvasContext.putImageData(this.options.imageData, 0, 0);
+            this.variables.canvasContext.
+                putImageData(this.options.imageData, 0 + this.options.moveImg[0], 0 + this.options.moveImg[1]);
             this._trigger("manipulation_cb");
         },
 
@@ -483,9 +546,12 @@ $(function () {
             this.variables.canvasContext.save();
             this.variables.canvasContext.clearRect(0, 0, this.variables.canvas.width, this.variables.canvas.height);
             this.variables.canvasContext.scale(ver, hor);
-            this.variables.canvasContext.drawImage(this.variables.curImg[0], ver * width, hor * height);
+            this.variables.canvasContext.
+                drawImage(this.variables.curImg[0], (ver * width) + (ver * this.options.moveImg[0]),
+                    (hor * height) + (hor * this.options.moveImg[1]));
             this.variables.canvasContext.restore();
-            this.variables.originalImageData = this.variables.canvasContext.getImageData(0, 0, this.variables.imgWidth, this.variables.imgHeight);
+            this.variables.originalImageData =
+                this.variables.canvasContext.getImageData(0 + this.options.moveImg[0], 0 + this.options.moveImg[1], this.variables.imgWidth, this.variables.imgHeight);
         },
 
         ////////////////////
@@ -537,13 +603,16 @@ $(function () {
 
             var self = this;
             tempImg.load( function() {
-                self.variables.canvas.width  = self.variables.imgWidth  + self.options.canvasWidthExt;
-                self.variables.canvas.height = self.variables.imgHeight + self.options.canvasHeightExt;
-                self.variables.canvasContext.drawImage(tempImg[0], 0, 0);
+                self.variables.canvas.width  = self.variables.imgWidth  + self.options.canvasExt[0];
+                self.variables.canvas.height = self.variables.imgHeight + self.options.canvasExt[1];
+                self.variables.canvasContext.
+                    drawImage(tempImg[0], 0 + self.options.moveImg[0], 0 + self.options.moveImg[1]);
     
                 // get the imagedata
-                self.variables.originalImageData = self.variables.canvasContext.getImageData(0, 0, self.variables.imgWidth, self.variables.imgHeight);
-                self.options.imageData = self.variables.canvasContext.getImageData(0, 0, self.variables.imgWidth, self.variables.imgHeight);
+                self.variables.originalImageData = self.variables.canvasContext.
+                    getImageData(0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.variables.imgWidth, self.variables.imgHeight);
+                self.options.imageData = self.variables.canvasContext.
+                    getImageData(0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.variables.imgWidth, self.variables.imgHeight);
     
                 self._flipImg();
                 self._manipulateImg();
@@ -558,6 +627,8 @@ $(function () {
             this.variables.curImg.remove();
             this.variables.undoArray.remove();
             this.variables.imgArray.remove();
+            this.options.canvasExt.remove();
+            this.options.moveImg.remove();
             // unbind Callbacks
             this.element.unbind("create_cb");
             this.element.unbind("undo_cb");

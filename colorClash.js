@@ -16,8 +16,9 @@
             undo:               false,
             imageData:          null,
             img:                null,
-            canvasWidthExt:     0,
-            canvasHeightExt:    0,
+            canvasExt:          null,
+            moveImg:            null,
+
             // callbacks
             create_cb:          null,
             undo_cb:            null,
@@ -57,11 +58,16 @@
 
             var self = this;
             tempImg.load( function() {
-                self.variables.canvas.width  = self.variables.imgWidth  + self.options.canvasWidthExt;
-                self.variables.canvas.height = self.variables.imgHeight + self.options.canvasHeightExt;
-                self.variables.canvasContext.drawImage(tempImg[0], 0, 0);
-                self.variables.originalImageData = self.variables.canvasContext.getImageData(0, 0, self.variables.imgWidth, self.variables.imgHeight);
-                self.options.imageData = self.variables.canvasContext.getImageData(0, 0, self.variables.imgWidth, self.variables.imgHeight);
+                self.variables.canvas.width  = self.variables.imgWidth  + self.options.canvasExt[0];
+                self.variables.canvas.height = self.variables.imgHeight + self.options.canvasExt[1];
+                self.variables.canvasContext.
+                    drawImage(tempImg[0], 0 + self.options.moveImg[0], 0 + self.options.moveImg[1]);
+    
+                self.variables.originalImageData = self.variables.canvasContext.
+                    getImageData(0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.variables.imgWidth, self.variables.imgHeight);
+                self.options.imageData = self.variables.canvasContext.
+                    getImageData(0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.variables.imgWidth, self.variables.imgHeight);
+    
                 self._flipImg();
                 self._manipulateImg();
                 self._trigger("create_cb");
@@ -72,29 +78,37 @@
         // Use the _setOption method to respond to changes to options
         _setOption: function (key, value) {
         ////////////////////
+            var manipulate = false;
             switch (key) {
                 case "red":
                     this.variables.undoArray.push("red", this.options.red);
+                    manipulate = true;
                     break;
                 case "green":
                     this.variables.undoArray.push("green", this.options.green);
+                    manipulate = true;
                     break;
                 case "blue":
                     this.variables.undoArray.push("blue", this.options.blue);
+                    manipulate = true;
                     break;
                 case "lighten":
                     this.variables.undoArray.push("lighten", this.options.lighten);
+                    manipulate = true;
                     break;
                 case "saturate":
                     if (value > 1) { value = 1; }
                         else if (value < 0) { value = 0; }
                         this.variables.undoArray.push("saturate", this.options.saturate);
+                        manipulate = true;
                     break;
                 case "temperature":
                     this.variables.undoArray.push("temperature", this.options.temperature);
+                    manipulate = true;
                     break;
                 case "coloring":
                     this.variables.undoArray.push("coloring", this.options.coloring);
+                    manipulate = true;
                     break;
                 case "vertical":
                     this.variables.undoArray.push("vertical", this.options.vertical);
@@ -110,29 +124,43 @@
                     return;
                 case "undo":
                     this.undo(value);
+                    manipulate = true;
                     break;
                 case "imageData":
-                    // needs to be implemented correctly
                     this._imageData(value);
                     if (value !== undefined) {
                         return;
                     }
+                    manipulate = true;
                     break;
                 case "img":
                     this.variables.undoArray.push("img", this.options.img);
                     this._img(value);
+                    manipulate = true;
                     break;
-                case "canvasWidthExt":
-                    if (value < 0 && this.options.imgWidth - (-1 * value) < 0 ) { value = -1 * this.options.imgWidth; }
-                    this.variables.canvas.width  = this.options.imgWidth + value;
+                case "canvasExt":
+                    if (value[0] < 0 && this.variables.imgWidth - (-1 * value[0]) < 0 ) { value[0] = -1 * this.variables.imgWidth; }
+                    this.variables.canvas.width  = this.variables.imgWidth  + value[0];
+                    if (value[1] < 0 && this.variables.imgHeight - (-1 * value[1]) < 0 ) { value[1] = -1 * this.variables.imgHeight; }
+                    this.variables.canvas.height = this.variables.imgHeight  + value[1];
                     break;
-                case "canvasHeightExt":
-                    if (value < 0 && this.options.imgHeight - (-1 * value) < 0 ) { value = -1 * this.options.imgHeight; }
-                    this.variables.canvas.height = this.options.imgHeight + value;
+                case "moveImg":
+                    if (value[0] < 0) { value[0] = 0; }
+                    if (value[0] > 0 && value[0] + this.variables.imgWidth > this.variables.canvas.width) {
+                        value[0] = this.variables.canvas.width - this.variables.imgWidth; }
+                       
+                    if (value[1] < 0) { value[1] = 0; }
+                    if (value[1] > 0 && value[1] + this.variables.imgHeight > this.variables.canvas.height) {
+                        value[1] = this.variables.canvas.height - this.variables.imgHeight; }
+
+                    this.variables.canvasContext.clearRect(0, 0, this.variables.canvas.width, this.variables.canvas.height);
+                    this.variables.canvasContext.putImageData(this.options.imageData, 0 + value[0], 0 + value[1]);
                     break;
             }
             $.Widget.prototype._setOption.apply(this, arguments);
-            this._manipulateImg();
+            if (manipulate === true) {
+                this._manipulateImg();
+            }
         },
 
         // Undo last action
@@ -247,7 +275,8 @@
                 tempImageData_data[countOfPixels + 2] = greyscaleIntensity * (1 - tempSaturate) + newB * tempSaturate;
             }
             this.options.imageData.data = tempImageData_data;
-            this.variables.canvasContext.putImageData(this.options.imageData, 0, 0);
+            this.variables.canvasContext.
+                putImageData(this.options.imageData, 0 + this.options.moveImg[0], 0 + this.options.moveImg[1]);
             this._trigger("manipulation_cb");
         },
 
@@ -267,9 +296,12 @@
             this.variables.canvasContext.save();
             this.variables.canvasContext.clearRect(0, 0, this.variables.canvas.width, this.variables.canvas.height);
             this.variables.canvasContext.scale(ver, hor);
-            this.variables.canvasContext.drawImage(this.variables.curImg[0], ver * width, hor * height);
+            this.variables.canvasContext.
+                drawImage(this.variables.curImg[0], (ver * width) + (ver * this.options.moveImg[0]),
+                    (hor * height) + (hor * this.options.moveImg[1]));
             this.variables.canvasContext.restore();
-            this.variables.originalImageData = this.variables.canvasContext.getImageData(0, 0, this.variables.imgWidth, this.variables.imgHeight);
+            this.variables.originalImageData =
+                this.variables.canvasContext.getImageData(0 + this.options.moveImg[0], 0 + this.options.moveImg[1], this.variables.imgWidth, this.variables.imgHeight);
         },
 
         ////////////////////
@@ -318,11 +350,16 @@
 
             var self = this;
             tempImg.load( function() {
-                self.variables.canvas.width  = self.variables.imgWidth  + self.options.canvasWidthExt;
-                self.variables.canvas.height = self.variables.imgHeight + self.options.canvasHeightExt;
-                self.variables.canvasContext.drawImage(tempImg[0], 0, 0);
-                self.variables.originalImageData = self.variables.canvasContext.getImageData(0, 0, self.variables.imgWidth, self.variables.imgHeight);
-                self.options.imageData = self.variables.canvasContext.getImageData(0, 0, self.variables.imgWidth, self.variables.imgHeight);
+                self.variables.canvas.width  = self.variables.imgWidth  + self.options.canvasExt[0];
+                self.variables.canvas.height = self.variables.imgHeight + self.options.canvasExt[1];
+                self.variables.canvasContext.
+                    drawImage(tempImg[0], 0 + self.options.moveImg[0], 0 + self.options.moveImg[1]);
+    
+                self.variables.originalImageData = self.variables.canvasContext.
+                    getImageData(0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.variables.imgWidth, self.variables.imgHeight);
+                self.options.imageData = self.variables.canvasContext.
+                    getImageData(0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.variables.imgWidth, self.variables.imgHeight);
+    
                 self._flipImg();
                 self._manipulateImg();
                 self.variables.imgArray.push([value, tempImg]);
@@ -332,9 +369,11 @@
         // Use the destroy method to clean up any modifications your widget has made to the DOM
         destroy: function () {
         ////////////////////
-            this.variables.img.remove();
+            this.variables.curImg.remove();
             this.variables.undoArray.remove();
             this.variables.imgArray.remove();
+            this.options.canvasExt.remove();
+            this.options.moveImg.remove();
             
             this.element.unbind("create_cb");
             this.element.unbind("undo_cb");
