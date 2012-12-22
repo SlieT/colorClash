@@ -2,9 +2,7 @@ $(function () {
 
     // invoke widget
     $( '#kannwas' ).colorClash({
-        imgSrc:             "img/Plant.jpg",
-        imgWidth:           800,
-        imgHeight:          480,
+        img:                ["img/Plant.jpg", 800, 480],
         //temperature:        300,
         //horizontal:         true,
         //canvasWidthExt:     -100,
@@ -18,7 +16,7 @@ $(function () {
             
             if (ui.name === "green") {
                 $( "#Green" ).slider( "option", "value",
-                                    $( '#kannwas' ).colorClash("option", "gree"));
+                                    $( '#kannwas' ).colorClash("option", "green"));
             }
             
             if (ui.name === "blue") {
@@ -155,13 +153,13 @@ $(function () {
     });
 
     $( "#ChangeImg" ).click(function () {
-        if ($( '#kannwas' ).colorClash("option", "imgSrc") === "img/Plant.jpg") {
-            $( '#kannwas' ).colorClash("option", "imgSrc", "img/Plant2.jpg");
+        if ($( '#kannwas' ).colorClash("option", "img")[0] === "img/Plant.jpg") {
+            $( '#kannwas' ).colorClash("option", "img", ["img/Plant2.jpg", 800, 480]);
         }
         else{
-            $( '#kannwas' ).colorClash("option", "imgSrc", "img/Plant.jpg");
+            $( '#kannwas' ).colorClash("option", "img", ["img/Plant.jpg", 800, 480]);
         }
-        //console.log($( '#kannwas' ).colorClash("option", "imgSrc"));
+        //console.log($( '#kannwas' ).colorClash("option", "img"));
     });
 
 });
@@ -185,9 +183,7 @@ $(function () {
             horizontal:         false,
             undo:               false,
             imageData:          null,
-            imgSrc:             null,
-            imgWidth:           0,
-            imgHeight:          0,
+            img:                null,
             canvasWidthExt:     0,
             canvasHeightExt:    0,
             // callbacks
@@ -197,11 +193,15 @@ $(function () {
         },
 
         variables: {
-            img:                null,
+            curImg:             null,
+            imgSrc:             null,
+            imgWidth:           0,
+            imgHeight:          0,
             canvas:             null,
             canvasContext:      null,
             originalImageData:  null,
-            undoArray:          null
+            undoArray:          null,
+            imgArray:           null
         },
 
         // Set up the widget
@@ -209,27 +209,37 @@ $(function () {
         ////////////////////
             this.variables.canvas = this.element[0];
             this.variables.canvasContext = this.element[0].getContext('2d');
-
-            // create an img which gets destroyed later in the "destroy"-method
-            this.variables.img = $("<img/>");
-            this.variables.img.attr({
-                src: this.options.imgSrc,
-                width: this.options.imgWidth,
-                height: this.options.imgHeight
-            });
-
-            this.variables.canvas.width  = this.options.imgWidth  + this.options.canvasWidthExt;
-            this.variables.canvas.height = this.options.imgHeight + this.options.canvasHeightExt;
-            this.variables.canvasContext.drawImage(this.variables.img[0], 0, 0);
-
-            // get the imagedata
-            this.variables.originalImageData = this.variables.canvasContext.getImageData(0, 0, this.options.imgWidth, this.options.imgHeight);
-            this.options.imageData = this.variables.canvasContext.getImageData(0, 0, this.options.imgWidth, this.options.imgHeight);
             // create the undoarray which gets destroyed later in the "destroy"-method
             this.variables.undoArray = [];
-            this._flipImg();
-            this._manipulateImg();
-            this._trigger("create_cb");
+            this.variables.imgArray = [];
+
+            // create an img as a deep copy which gets destroyed later in the "destroy"-method (imgArray.remove())
+            var tempImg = $("<img/>");
+            this.variables.imgSrc       = this.options.img[0];
+            this.variables.imgWidth     = this.options.img[1];
+            this.variables.imgHeight    = this.options.img[2];
+            tempImg.attr({
+                src:    this.options.img[0],
+                width:  this.options.img[1],
+                height: this.options.img[2]
+            });
+            this.variables.curImg = tempImg;
+
+            var self = this;
+            tempImg.load( function() {
+                self.variables.canvas.width  = self.variables.imgWidth  + self.options.canvasWidthExt;
+                self.variables.canvas.height = self.variables.imgHeight + self.options.canvasHeightExt;
+                self.variables.canvasContext.drawImage(tempImg[0], 0, 0);
+    
+                // get the imagedata
+                self.variables.originalImageData = self.variables.canvasContext.getImageData(0, 0, self.variables.imgWidth, self.variables.imgHeight);
+                self.options.imageData = self.variables.canvasContext.getImageData(0, 0, self.variables.imgWidth, self.variables.imgHeight);
+    
+                self._flipImg();
+                self._manipulateImg();
+                self._trigger("create_cb");
+                self.variables.imgArray.push([self.options.img, tempImg]);
+            });
         },
 
         // Use the _setOption method to respond to changes to options
@@ -295,30 +305,19 @@ $(function () {
                         return;
                     }
                     break;
-                case "imgSrc":
-                    this.variables.undoArray.push("imgSrc", this.options.imgSrc);
-                    this._imgSrc(value);
-                    this._flipImg();
+                case "img":
+                    this.variables.undoArray.push("img", this.options.img);
+                    this._img(value);
                     //console.log("imgSrc");
                     break;
-                case "imgWidth":
-                    if (value < 0) { value = 0; }
-                    this.variables.img.attr("width", value);
-                    //console.log("imgWidth");
-                    break;
-                case "imgHeight":
-                    if (value < 0) { value = 0; }
-                    this.variables.img.attr("height", value);
-                    //console.log("imgHeight");
-                    break;
                 case "canvasWidthExt":
-                    if (value < 0 && this.options.imgWidth - (-1 * value) < 0 ) { value = -1 * this.options.imgWidth; }
-                    this.variables.canvas.width  = this.options.imgWidth  + value;
+                    if (value < 0 && this.variables.imgWidth - (-1 * value) < 0 ) { value = -1 * this.variables.imgWidth; }
+                    this.variables.canvas.width  = this.variables.imgWidth  + value;
                     //console.log("canvasWidthExt");
                     break;
                 case "canvasHeightExt":
-                    if (value < 0 && this.options.imgHeight - (-1 * value) < 0 ) { value = -1 * this.options.imgHeight; }
-                    this.variables.canvas.height = this.options.imgHeight  + value;
+                    if (value < 0 && this.variables.imgHeight - (-1 * value) < 0 ) { value = -1 * this.variables.imgHeight; }
+                    this.variables.canvas.height = this.variables.imgHeight  + value;
                     //console.log("canvasHeightExt");
                     break;
             }
@@ -340,10 +339,10 @@ $(function () {
                 if (value) {
                     
                     if (this.variables.undoArray.length > 0) {
-
                         // get the last action and its value
                         action = this.variables.undoArray[this.variables.undoArray.length - 2];
                         value  = this.variables.undoArray[this.variables.undoArray.length - 1];
+                        //console.log(action, value);
 
                         // set the old value and apply it to the image
                         if (action === "red") {
@@ -391,10 +390,9 @@ $(function () {
                             this._flipImg();
                         }
 
-                        if (action === "imgSrc") {
-                            this.options.imgSrc = value;
-                            this._imgSrc(value);
-                            this._flipImg();
+                        if (action === "img") {
+                            this.options.img = value;
+                            this._img(value);
                         }
 
                         // the old state is now the current one so delete the last two entries
@@ -422,7 +420,7 @@ $(function () {
             constR = constG = constB =
             greyscaleIntensity = 0;
             tempSaturate                = this.options.saturate;
-            countOfPixels               = this.options.imgWidth * this.options.imgHeight * 4;
+            countOfPixels               = this.variables.imgWidth * this.variables.imgHeight * 4;
             tempOriginalImageData_data  = this.variables.originalImageData.data;
             tempImageData_data          = this.options.imageData.data;
 
@@ -471,23 +469,23 @@ $(function () {
             // placing the image in the right position after the flipping happend
             var ver = 1,
                 hor = 1,
-                width = this.options.imgWidth,
-                height = this.options.imgHeight;
+                width = this.variables.imgWidth,
+                height = this.variables.imgHeight;
 
             // there are four different ways (ver, none) (hor, none) (ver, hor) (none,none)
             // caution! there are four IF-Statements (no if-else) so in case of (ver, hor) the first
             // three if-statements return true btw -1 indicates the flipping
             if (this.options.vertical) { ver = -1; height = 0; }
             if (this.options.horizontal) { hor = -1; width = 0; }
-            if (this.options.vertical && this.options.horizontal) { width = this.options.imgWidth; height = this.options.imgHeight; }
+            if (this.options.vertical && this.options.horizontal) { width = this.variables.imgWidth; height = this.variables.imgHeight; }
             if (!this.options.vertical && !this.options.horizontal) { width = 0; height = 0; }
 
             this.variables.canvasContext.save();
             this.variables.canvasContext.clearRect(0, 0, this.variables.canvas.width, this.variables.canvas.height);
             this.variables.canvasContext.scale(ver, hor);
-            this.variables.canvasContext.drawImage(this.variables.img[0], ver * width, hor * height);
+            this.variables.canvasContext.drawImage(this.variables.curImg[0], ver * width, hor * height);
             this.variables.canvasContext.restore();
-            this.variables.originalImageData = this.variables.canvasContext.getImageData(0, 0, this.options.imgWidth, this.options.imgHeight);
+            this.variables.originalImageData = this.variables.canvasContext.getImageData(0, 0, this.variables.imgWidth, this.variables.imgHeight);
         },
 
         ////////////////////
@@ -500,22 +498,66 @@ $(function () {
             }
         },
 
+        // apply the new image
+        _img: function (value) {
         ////////////////////
-        _imgSrc: function (value) {
-        ////////////////////
-            // see _create()
-            this.variables.img.attr("src", value);
-            this.variables.canvasContext.drawImage(this.variables.img[0], 0, 0);
-            this.variables.originalImageData = this.variables.canvasContext.getImageData(0, 0, this.options.imgWidth, this.options.imgHeight);
-            this.options.imageData = this.variables.canvasContext.getImageData(0, 0, this.options.imgWidth, this.options.imgHeight);
+            // check if image was loaded before
+            var firstTime = true;
+
+            for (var i = this.variables.imgArray.length - 1; i >= 0; i--) {
+                //console.log(this.variables.imgArray[i][0], value);
+                if (this.variables.imgArray[i][0][0] === value[0]) {
+                    firstTime = false;
+                    
+                    this.options.img = value;
+                    this.variables.imgSrc = value[0];
+                    this.variables.imgWidth = value[1];
+                    this.variables.imgHeight = value[2];
+                    this.variables.curImg = this.variables.imgArray[i][1];
+                    this._flipImg();
+                    return;
+                }
+            }
+
+            if (firstTime === false) {
+                return;
+            }
+
+            // create an img as a deep copy which gets destroyed later in the "destroy"-method (imgArray.remove())
+            var tempImg = $("<img/>");
+            this.variables.imgSrc       = value[0];
+            this.variables.imgWidth     = value[1];
+            this.variables.imgHeight    = value[2];
+            tempImg.attr({
+                src:    value[0],
+                width:  value[1],
+                height: value[2]
+            });
+            this.variables.curImg = tempImg;
+
+            var self = this;
+            tempImg.load( function() {
+                self.variables.canvas.width  = self.variables.imgWidth  + self.options.canvasWidthExt;
+                self.variables.canvas.height = self.variables.imgHeight + self.options.canvasHeightExt;
+                self.variables.canvasContext.drawImage(tempImg[0], 0, 0);
+    
+                // get the imagedata
+                self.variables.originalImageData = self.variables.canvasContext.getImageData(0, 0, self.variables.imgWidth, self.variables.imgHeight);
+                self.options.imageData = self.variables.canvasContext.getImageData(0, 0, self.variables.imgWidth, self.variables.imgHeight);
+    
+                self._flipImg();
+                self._manipulateImg();
+                self.variables.imgArray.push([value, tempImg]);
+            });
         },
 
         // Use the destroy method to clean up any modifications your widget has made to the DOM
         destroy: function () {
         ////////////////////
             // remove the Elements added by the Widget
-            this.variables.img.remove();
+            this.variables.curImg.remove();
             this.variables.undoArray.remove();
+            this.variables.imgArray.remove();
             // unbind Callbacks
             this.element.unbind("create_cb");
             this.element.unbind("undo_cb");

@@ -1,16 +1,14 @@
 colorClash
 ==========
 
-colorClash is a JavaScript Widget which performs some simple Imagemanipulation in a performant way.
+colorClash is a JavaScript widget which performs some simple imagemanipulation in a performant way.
 
 Setting up the Widget
 ---------------------
-At its minimum it needs the imgSrc, imgWidth and imgHeight
+At its minimum it needs the img given as an array with its imgSrc, imgWidth and imgHeight.
 
 	  $( "#canvasName" ).colorClash({
-        imgSrc:     "img/Plant.jpg",
-        imgWidth:   800,
-        imgHeight:  480
+        img:	["img/Plant.jpg", 800, 480]
     });
 
 
@@ -42,8 +40,7 @@ Lets change the degree of saturation (value between 0 and 1)
 - vertical
 - horizontal
 - undo
-- imgWidth
-- imgHeight
+- img
 - canvasWidthExt
 - canvasHeightExt
 
@@ -58,26 +55,22 @@ saturate
 ##### true to false #####
 vertical, horizontal, undo
 
-##### greater 0 #####
-imgWidth, imgHeight
-
 ##### -x to y #####
 canvasWidthExt, canvasHeightExt 
 (if the negative value is greater than the positive value of imgWidth/imgHeight the value
 becomes -imgWidth/imgHeight)
 
+##### leftovers #####
+img takes an array of three values [imgSrc, imgWidth, imgHeight]
+
 
 To-do
 -----
-- my english isn't the best so if you want to correct me in my comments feel free to 
+- my english isn't the best, so if you want to correct me in my comments feel free to 
   	do so.
 		
 - implement imageData correctly (also change Width and Height, maybe create an Image for
 		easier internal useage) - if this is done change the name to imgData and add it to "undo".
-
-- if imgWidth or imgHeight changes, apply these changes correctly to the 
-		_imgManipulation-methode (2 for loops instead of "countOfPixels" so that only 
-		the width * height rectangle gets manipulated).
 
 - if canvasWidthExt or canvasHeightExt changes apply these changes to the imgWidth or 
 		imgHeight if it affects them.
@@ -93,13 +86,8 @@ Notice
 
 Bugs
 ----
-- "often" when you load the page the first time the image isn't visible on the canvas 
-		and (on first time loading) if you click the "ChangeImg"-button the other Image 
-		isn't visible nether (it seems like after some refreshes the images are cached 
-		and therefore it works).
-
-- when viewing the index.html in Chrome throws some errors (don't even know what its 
-    doing in Safari).
+- when viewing the index.html in Chrome throws some errors (website needs to run on a server).
+		Don't know who fine it works on Safari and ChangeImg got problems on the IE
 
 
 Future-features (I'll do them tomorrow... i'll promise... or maybe you can ?)

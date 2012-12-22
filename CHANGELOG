@@ -1,0 +1,6 @@
+v0.1.1
+------
+- imgSrc, imgWidth, imgHeight are now part of the (hidden) "variables"-object and "img" is
+		the new option in "options", where "img" is an array ([imgSrc, imgWidth, imgHeight]).
+
+- the image is now shown as soon as it's loaded and stored in the imgArray for faster reuse.

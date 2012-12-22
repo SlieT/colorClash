@@ -15,9 +15,7 @@
             horizontal:         false,
             undo:               false,
             imageData:          null,
-            imgSrc:             null,
-            imgWidth:           0,
-            imgHeight:          0,
+            img:                null,
             canvasWidthExt:     0,
             canvasHeightExt:    0,
             // callbacks
@@ -27,11 +25,15 @@
         },
 
         variables: {
-            img:                null,
+            curImg:             null,
+            imgSrc:             null,
+            imgWidth:           0,
+            imgHeight:          0,
             canvas:             null,
             canvasContext:      null,
             originalImageData:  null,
-            undoArray:          null
+            undoArray:          null,
+            imgArray:           null
         },
 
         // Set up the widget
@@ -39,25 +41,32 @@
         ////////////////////
             this.variables.canvas = this.element[0];
             this.variables.canvasContext = this.element[0].getContext('2d');
-
-            this.variables.img = $("<img/>");
-            this.variables.img.attr({
-                src: this.options.imgSrc,
-                width: this.options.imgWidth,
-                height: this.options.imgHeight
-            });
-
-            this.variables.canvas.width  = this.options.imgWidth  + this.options.canvasWidthExt;
-            this.variables.canvas.height = this.options.imgHeight + this.options.canvasHeightExt;
-            this.variables.canvasContext.drawImage(this.variables.img[0], 0, 0);
-
-            this.variables.originalImageData = this.variables.canvasContext.getImageData(0, 0, this.options.imgWidth, this.options.imgHeight);
-            this.options.imageData = this.variables.canvasContext.getImageData(0, 0, this.options.imgWidth, this.options.imgHeight);
-
             this.variables.undoArray = [];
-            this._flipImg();
-            this._manipulateImg();
-            this._trigger("create_cb");
+            this.variables.imgArray = [];
+
+            var tempImg = $("<img/>");
+            this.variables.imgSrc       = this.options.img[0];
+            this.variables.imgWidth     = this.options.img[1];
+            this.variables.imgHeight    = this.options.img[2];
+            tempImg.attr({
+                src:    this.options.img[0],
+                width:  this.options.img[1],
+                height: this.options.img[2]
+            });
+            this.variables.curImg = tempImg;
+
+            var self = this;
+            tempImg.load( function() {
+                self.variables.canvas.width  = self.variables.imgWidth  + self.options.canvasWidthExt;
+                self.variables.canvas.height = self.variables.imgHeight + self.options.canvasHeightExt;
+                self.variables.canvasContext.drawImage(tempImg[0], 0, 0);
+                self.variables.originalImageData = self.variables.canvasContext.getImageData(0, 0, self.variables.imgWidth, self.variables.imgHeight);
+                self.options.imageData = self.variables.canvasContext.getImageData(0, 0, self.variables.imgWidth, self.variables.imgHeight);
+                self._flipImg();
+                self._manipulateImg();
+                self._trigger("create_cb");
+                self.variables.imgArray.push([self.options.img, tempImg]);
+            });
         },
 
         // Use the _setOption method to respond to changes to options
@@ -109,18 +118,9 @@
                         return;
                     }
                     break;
-                case "imgSrc":
-                    this.variables.undoArray.push("imgSrc", this.options.imgSrc);
-                    this._imgSrc(value);
-                    this._flipImg();
-                    break;
-                case "imgWidth":
-                    if (value < 0) { value = 0; }
-                    this.variables.img.attr("width", value);
-                    break;
-                case "imgHeight":
-                    if (value < 0) { value = 0; }
-                    this.variables.img.attr("height", value);
+                case "img":
+                    this.variables.undoArray.push("img", this.options.img);
+                    this._img(value);
                     break;
                 case "canvasWidthExt":
                     if (value < 0 && this.options.imgWidth - (-1 * value) < 0 ) { value = -1 * this.options.imgWidth; }
@@ -198,10 +198,9 @@
                             this._flipImg();
                         }
 
-                        if (action === "imgSrc") {
-                            this.options.imgSrc = value;
-                            this._imgSrc(value);
-                            this._flipImg();
+                        if (action === "img") {
+                            this.options.img = value;
+                            this._img(value);
                         }
 
                         this.variables.undoArray.pop();
@@ -226,7 +225,7 @@
             constR = constG = constB =
             greyscaleIntensity = 0;
             tempSaturate                = this.options.saturate;
-            countOfPixels               = this.options.imgWidth * this.options.imgHeight * 4;
+            countOfPixels               = this.variables.imgWidth * this.variables.imgHeight * 4;
             tempOriginalImageData_data  = this.variables.originalImageData.data;
             tempImageData_data          = this.options.imageData.data;
 
@@ -234,7 +233,6 @@
             constG = this.options.green + this.options.lighten                            - this.options.coloring;
             constB = this.options.blue  + this.options.lighten - this.options.temperature + this.options.coloring;
 
-            // where the magic happens
             while (countOfPixels) {
                 countOfPixels -= 4;
                 
@@ -248,31 +246,30 @@
                 tempImageData_data[countOfPixels + 1] = greyscaleIntensity * (1 - tempSaturate) + newG * tempSaturate;
                 tempImageData_data[countOfPixels + 2] = greyscaleIntensity * (1 - tempSaturate) + newB * tempSaturate;
             }
-
             this.options.imageData.data = tempImageData_data;
             this.variables.canvasContext.putImageData(this.options.imageData, 0, 0);
             this._trigger("manipulation_cb");
         },
 
-        // Flip the image
+        // flip the image
         _flipImg: function() {
         ////////////////////
             var ver = 1,
                 hor = 1,
-                width = this.options.imgWidth,
-                height = this.options.imgHeight;
+                width = this.variables.imgWidth,
+                height = this.variables.imgHeight;
 
             if (this.options.vertical) { ver = -1; height = 0; }
             if (this.options.horizontal) { hor = -1; width = 0; }
-            if (this.options.vertical && this.options.horizontal) { width = this.options.imgWidth; height = this.options.imgHeight; }
+            if (this.options.vertical && this.options.horizontal) { width = this.variables.imgWidth; height = this.variables.imgHeight; }
             if (!this.options.vertical && !this.options.horizontal) { width = 0; height = 0; }
 
             this.variables.canvasContext.save();
             this.variables.canvasContext.clearRect(0, 0, this.variables.canvas.width, this.variables.canvas.height);
             this.variables.canvasContext.scale(ver, hor);
-            this.variables.canvasContext.drawImage(this.variables.img[0], ver * width, hor * height);
+            this.variables.canvasContext.drawImage(this.variables.curImg[0], ver * width, hor * height);
             this.variables.canvasContext.restore();
-            this.variables.originalImageData = this.variables.canvasContext.getImageData(0, 0, this.options.imgWidth, this.options.imgHeight);
+            this.variables.originalImageData = this.variables.canvasContext.getImageData(0, 0, this.variables.imgWidth, this.variables.imgHeight);
         },
 
         ////////////////////
@@ -285,13 +282,51 @@
             }
         },
 
-        // Set new source
-        _imgSrc: function (value) {
+        // apply the new image
+        _img: function (value) {
         ////////////////////
-            this.variables.img.attr("src", value);
-            this.variables.canvasContext.drawImage(this.variables.img[0], 0, 0);
-            this.variables.originalImageData = this.variables.canvasContext.getImageData(0, 0, this.options.imgWidth, this.options.imgHeight);
-            this.options.imageData = this.variables.canvasContext.getImageData(0, 0, this.options.imgWidth, this.options.imgHeight);
+            var firstTime = true;
+
+            for (var i = this.variables.imgArray.length - 1; i >= 0; i--) {
+                if (this.variables.imgArray[i][0][0] === value[0]) {
+                    firstTime = false;
+                    
+                    this.options.img = value;
+                    this.variables.imgSrc = value[0];
+                    this.variables.imgWidth = value[1];
+                    this.variables.imgHeight = value[2];
+                    this.variables.curImg = this.variables.imgArray[i][1];
+                    this._flipImg();
+                    return;
+                }
+            }
+
+            if (firstTime === false) {
+                return;
+            }
+
+            var tempImg = $("<img/>");
+            this.variables.imgSrc       = value[0];
+            this.variables.imgWidth     = value[1];
+            this.variables.imgHeight    = value[2];
+            tempImg.attr({
+                src:    value[0],
+                width:  value[1],
+                height: value[2]
+            });
+            this.variables.curImg = tempImg;
+
+            var self = this;
+            tempImg.load( function() {
+                self.variables.canvas.width  = self.variables.imgWidth  + self.options.canvasWidthExt;
+                self.variables.canvas.height = self.variables.imgHeight + self.options.canvasHeightExt;
+                self.variables.canvasContext.drawImage(tempImg[0], 0, 0);
+                self.variables.originalImageData = self.variables.canvasContext.getImageData(0, 0, self.variables.imgWidth, self.variables.imgHeight);
+                self.options.imageData = self.variables.canvasContext.getImageData(0, 0, self.variables.imgWidth, self.variables.imgHeight);
+                self._flipImg();
+                self._manipulateImg();
+                self.variables.imgArray.push([value, tempImg]);
+            });
         },
 
         // Use the destroy method to clean up any modifications your widget has made to the DOM
@@ -299,7 +334,8 @@
         ////////////////////
             this.variables.img.remove();
             this.variables.undoArray.remove();
-
+            this.variables.imgArray.remove();
+            
             this.element.unbind("create_cb");
             this.element.unbind("undo_cb");
             this.element.unbind("manipulation_cb");
