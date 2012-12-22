@@ -78,16 +78,28 @@ To-do
 
 Notice
 ------
+- demo.js contains the slider-demo and a commented version of the widget
+
 - don't change the canvas-size via css change it through the widget (to contain
-		the right proportion)!
+		the right proportion of the image on canvas)!
 
 - everything that works correctly gets added to the undo-function.
 
 
 Bugs
 ----
+<<<<<<< HEAD
 - when viewing the index.html in Chrome throws some errors (website needs to run on a server).
 		Don't know who fine it works on Safari and ChangeImg got problems on the IE
+=======
+- "often" when you load the page the first time the image isn't visible on the canvas 
+		and (on first time loading) if you click the "ChangeImg"-button the other Image 
+		isn't visible nether (it seems like after some refreshes the images are cached 
+		and therefore it works).
+
+- viewing the index.html in Chrome throws some errors (don't even know what its 
+    doing in Safari).
+>>>>>>> b3b3bae698d9a98f990940428e702ac43d9769a0
 
 
 Future-features (I'll do them tomorrow... i'll promise... or maybe you can ?)
