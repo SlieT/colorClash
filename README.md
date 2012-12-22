@@ -1,11 +1,11 @@
 colorClash
 ==========
 
-colorClash is a JavaScript widget which performs some simple imagemanipulation in a performant way.
+**colorClash** is a JavaScript widget which performs some simple imagemanipulation in a performant way.
 
 Setting up the Widget
 ---------------------
-At its minimum it needs the img given as an array with its imgSrc, imgWidth and imgHeight.
+At its minimum it needs the **img** given as an array with its imgSrc, imgWidth and imgHeight.
 
 	  $( "#canvasName" ).colorClash({
         img:	["img/Plant.jpg", 800, 480]
@@ -14,7 +14,7 @@ At its minimum it needs the img given as an array with its imgSrc, imgWidth and 
 
 Using the Widget (with a slider)
 --------------------------------
-Lets change the degree of saturation (value between 0 and 1)
+Lets change the degree of **saturation** (value between 0 and 1)
   
 	$( "#sliderName" ).slider({
 		value:          100,
@@ -27,47 +27,43 @@ Lets change the degree of saturation (value between 0 and 1)
         }
 	});
 
-Lets get the degree of saturation
+Lets get the degree of **saturation**
 
 	$( '#kannwas' ).colorClash("option", "saturate");
 
 
 ### Values ###
 
-- red
-- green
-- blue
-- lighten
-- saturate
-- temperature
-- coloring
-- vertical
-- horizontal
-- undo
-- img
-- canvasWidthExt
-- canvasHeightExt
+- **red**
+- **green**
+- **blue**
+- **lighten**
+- **saturate**
+- **temperature**
+- **coloring**
+- **vertical**
+- **horizontal**
+- **undo**
+- **img**
+- **canvasExt**
+- **moveImg**
 
 ### Range of Values ###
 
 ##### -255 to 255 #####
-red, green, blue, lighten, temperature, coloring
+- **red**, **green**, **blue**, **lighten**, **temperature**, **coloring**
 
 ##### 0 to 1 #####
-saturate
+- **saturate**
 
 ##### true to false #####
-vertical, horizontal, undo
-
-##### -x to y #####
-canvasWidthExt, canvasHeightExt 
-(if the negative value is greater than the positive value of imgWidth/imgHeight the value
-becomes -imgWidth/imgHeight)
+- **vertical**, **horizontal**, **undo**
 
 ##### arrays #####
-img takes an array of three values [imgSrc, imgWidth, imgHeight],
-canvasExt takes an array of two values [canvasWidthExt, canvasHeigthExt],
-moveImg takes an array of two values [moveX, moveY] where moveX, moveY > 0 (absolute position!)
+- **img** takes an array of three values [imgSrc, imgWidth, imgHeight],
+- **canvasExt** takes an array of two values [canvasWidthExt, canvasHeigthExt] \(if the negative value is greater
+than the positive value of imgWidth/imgHeight the value  becomes -imgWidth/-imgHeight\)
+- **moveImg** takes an array of two values [moveX, moveY] where moveX, moveY > 0 (absolute position!)
 
 
 To-do
@@ -77,9 +73,6 @@ To-do
 		
 - implement imageData correctly (also change Width and Height, maybe create an Image for
 		easier internal useage) - if this is done change the name to imgData and add it to "undo".
-
-- if canvasWidthExt or canvasHeightExt changes apply these changes to the imgWidth or 
-		imgHeight if it affects them.
 
 
 Notice
