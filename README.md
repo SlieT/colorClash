@@ -34,7 +34,7 @@ Lets get the degree of **saturation**
 
 Options
 -------
-### Values ###
+### Values ##
 
 - **red**
 - **green**
