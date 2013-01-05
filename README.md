@@ -92,8 +92,8 @@ To-do
 
 Notice
 ------
-- don't change the canvas-size via css change it through the widget (to contain
-		the right proportion)!   Use $( '#canvas' ).colorClash("option", "canvasExt", [extWidth, extHeight]);
+- don't change the canvas-size via css change it through the widget (to contain the right proportion)!  
+- 		Use $( '#canvas' ).colorClash("option", "canvasExt", [extWidth, extHeight]);
 
 - everything that works correctly (and manipulates the image!) gets added to the undo-function.
 		Till now you can undo **red**, **green**, **blue**, **lighten**, **saturate**, **temperature**, 
