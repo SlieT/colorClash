@@ -75,10 +75,10 @@ Options
 		than 0 (absolute width/height! - not relative to the current values).
 
 ### Callbacks ###
-- create_cb
-- undo_cb
-- reset_cb
-- manipulation_cb
+- **create_cb**
+- **undo_cb**
+- **reset_cb**
+- **manipulation_cb**
 
 
 To-do
