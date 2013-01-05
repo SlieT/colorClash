@@ -1,11 +1,7 @@
 colorClash
 ==========
 
-<<<<<<< HEAD
 **colorClash** is a JavaScript Widget which performs some simple imagemanipulation in a performant way.
-=======
-**colorClash** is a JavaScript widget which performs some simple imagemanipulation in a performant way.
->>>>>>> origin/master
 
 Setting up the Widget
 ---------------------
@@ -49,7 +45,6 @@ Options
 - **coloring**
 - **vertical**
 - **horizontal**
-<<<<<<< HEAD
 - **inverse**
 - **undo**
 - **reset**
@@ -57,12 +52,6 @@ Options
 - **canvasExt**
 - **moveImg**
 - **resizeImg**
-=======
-- **undo**
-- **img**
-- **canvasExt**
-- **moveImg**
->>>>>>> origin/master
 
 ### Range of Values ###
 
@@ -73,7 +62,6 @@ Options
 - **saturate**
 
 ##### true to false #####
-<<<<<<< HEAD
 - **vertical**, **horizontal**, **inverse**, **undo**, **reset**
 
 ##### arrays #####
@@ -91,15 +79,6 @@ Options
 - undo_cb
 - reset_cb
 - manipulation_cb
-=======
-- **vertical**, **horizontal**, **undo**
-
-##### arrays #####
-- **img** takes an array of three values [imgSrc, imgWidth, imgHeight],
-- **canvasExt** takes an array of two values [canvasWidthExt, canvasHeigthExt] \(if the negative value is greater
-than the positive value of imgWidth/imgHeight the value  becomes -imgWidth/-imgHeight\)
-- **moveImg** takes an array of two values [moveX, moveY] where moveX, moveY > 0 (absolute position!)
->>>>>>> origin/master
 
 
 To-do
