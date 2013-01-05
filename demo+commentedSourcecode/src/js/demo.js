@@ -5,8 +5,10 @@ $(function () {
         img:                ["img/Plant.jpg", 800, 480],
         //temperature:        300,
         //horizontal:         true,
-        canvasExt:          [200, 200],
-        moveImg:            [100, 50],
+        //inverse:            true,
+        //canvasExt:          [200, 200],
+        //moveImg:            [100, 50],
+        //resizeImg:          [667, 400],
         undo_cb: function(event, ui) {
             //console.log("do something after an undo was performend");
             if (ui.name === "red") {
@@ -43,9 +45,31 @@ $(function () {
                 $( "#Temperature" ).slider( "option", "value",
                                     $( '#kannwas' ).colorClash("option", "temperature"));
             }
+
+            if (ui.name === "resizeImg") {
+                $( "#ResizeWidth" ).slider( "option", "value",
+                                    $( '#kannwas' ).colorClash("option", "resizeImg")[0] - $( '#kannwas' ).colorClash("option", "img")[1]);
+                $( "#ResizeHeight" ).slider( "option", "value",
+                                    $( '#kannwas' ).colorClash("option", "resizeImg")[1] - $( '#kannwas' ).colorClash("option", "img")[2]);
+            }
         },
-        manipulation_cb: function() {
+
+        manipulation_cb: function () {
             //console.log("do something after a manipulation was performend");
+        },
+
+        reset_cb: function() {
+            $( "#Red" ).slider( "option", "value",                  0);
+            $( "#Green" ).slider( "option", "value",                0);
+            $( "#Blue" ).slider( "option", "value",                 0);
+            $( "#Lightness" ).slider( "option", "value",            0);
+            $( "#Saturation" ).slider( "option", "value",           1*100);
+            $( "#Color" ).slider( "option", "value",                0);
+            $( "#Temperature" ).slider( "option", "value",          0);
+            $( "#ResizeWidth" ).slider( "option", "value",          0);
+            $( "#ResizeHeight" ).slider( "option", "value",         0);
+            $( "#ResizeProportional" ).slider( "option", "value",   0);
+            $( "#Canvasextension" ).slider( "option", "value",      0);
         }
     });
 
@@ -55,7 +79,7 @@ $(function () {
         max:            255,
 		orientation:    "horizontal",
 		animate:        true,
-        stop: function(event, ui) {
+        stop: function (event, ui) {
             $( '#kannwas' ).colorClash("option", "red", ui.value);
             //console.log("Lightness", $( '#kannwas' ).colorClash("option", "red"));
         }
@@ -67,7 +91,7 @@ $(function () {
         max:            255,
         orientation:    "horizontal",
         animate:        true,
-        stop: function(event, ui) {
+        stop: function (event, ui) {
             $( '#kannwas' ).colorClash("option", "green", ui.value);
             //console.log("Lightness", $( '#kannwas' ).colorClash("option", "green"));
         }
@@ -79,7 +103,7 @@ $(function () {
         max:            255,
         orientation:    "horizontal",
         animate:        true,
-        stop: function(event, ui) {
+        stop: function (event, ui) {
             $( '#kannwas' ).colorClash("option", "blue", ui.value);
             //console.log("Lightness", $( '#kannwas' ).colorClash("option", "blue"));
         }
@@ -91,7 +115,7 @@ $(function () {
         max:            150,
 		orientation:    "horizontal",
 		animate:        true,
-        stop: function(event, ui) {
+        stop: function (event, ui) {
             $( '#kannwas' ).colorClash("option", "lighten", ui.value);
             //console.log("Lightness", $( '#kannwas' ).colorClash("option", "lighten"));
         }
@@ -103,7 +127,7 @@ $(function () {
         max:            100,
 		orientation:    "horizontal",
 		animate:        true,
-        stop: function(event, ui) {
+        stop: function (event, ui) {
             $( '#kannwas' ).colorClash("option", "saturate", ui.value/100);
             //console.log("Saturation", $( '#kannwas' ).colorClash("option", "saturate"));
         }
@@ -115,7 +139,7 @@ $(function () {
         max:            45,
 		orientation:    "horizontal",
 		animate:        true,
-        stop: function(event, ui) {
+        stop: function (event, ui) {
             $( '#kannwas' ).colorClash("option", "temperature", ui.value);
             //console.log("Temperature", $( '#kannwas' ).colorClash("option", "temperature"));
         }
@@ -127,24 +151,31 @@ $(function () {
         max:            45,
         orientation:    "horizontal",
         animate:        true,
-        stop: function(event, ui) {
+        stop: function (event, ui) {
             $( '#kannwas' ).colorClash("option", "coloring", ui.value);
             //console.log("Color", $( '#kannwas' ).colorClash("option", "coloring"));
         }
 	});
 
-    var x = true;
+    var v = true;
     $( "#Vertical" ).click(function () {
-        $( '#kannwas' ).colorClash("option", "vertical", x);
-        x = !x;
+        $( '#kannwas' ).colorClash("option", "vertical", v);
+        v = !v;
         //console.log("Vertical", $( '#kannwas' ).colorClash("option", "vertical"));
     });
 
-    var y = true;
+    var h = true;
     $( "#Horizontal" ).click(function () {
-            $( '#kannwas' ).colorClash("option", "horizontal", y);
-        y = !y;
+            $( '#kannwas' ).colorClash("option", "horizontal", h);
+        h = !h;
         //console.log("Horizontal", $( '#kannwas' ).colorClash("option", "horizontal"));
+    });
+
+    var i = true;
+    $( "#Inverse" ).click(function () {
+            $( '#kannwas' ).colorClash("option", "inverse", i);
+        i = !i;
+        //console.log("Inverse", $( '#kannwas' ).colorClash("option", "inverse"));
     });
 
     $( "#Undo" ).click(function () {
@@ -162,6 +193,11 @@ $(function () {
         //console.log($( '#kannwas' ).colorClash("option", "img"));
     });
 
+    $( "#Reset" ).click(function () {
+            $( '#kannwas' ).colorClash("option", "reset", true);
+        //console.log("Reset", $( '#kannwas' ).colorClash("option", "reset"));
+    });
+
 
     var element = $( "#kannwas" ),
         newMoveX = 0, newMoveY = 0, distImgToMouseX = 0, distImgToMouseY = 0;
@@ -174,17 +210,31 @@ $(function () {
                distImgToMouseY = e.pageY - ( element.offset().top + $( "#kannwas" ).colorClash("option", "moveImg")[1] );
                //console.log(distImgToMouseX, distImgToMouseY);
 
-                element.mousemove(function(e) {
-                    newMoveX = e.pageX - ( element.offset().left + distImgToMouseX );
-                    newMoveY = e.pageY - ( element.offset().top + distImgToMouseY );
-                    //console.log(newMoveX, newMoveY);
-                    $( "#kannwas" ).colorClash("option", "moveImg", [newMoveX, newMoveY]);
-                    element.mouseup(function(e) {
-                        element.unbind('mousemove');
+               if (distImgToMouseX < 0 || distImgToMouseY < 0 ||
+                    distImgToMouseX > $( '#kannwas' ).colorClash("option", "resizeImg")[0] ||
+                    distImgToMouseY > $( '#kannwas' ).colorClash("option", "resizeImg")[1]) {
+                    // do nothing, mouse is not in image
+               } else {
+                    element.mousemove(function(e) {
+                        newMoveX = e.pageX - ( element.offset().left + distImgToMouseX );
+                        newMoveY = e.pageY - ( element.offset().top + distImgToMouseY );
+                        //console.log(newMoveX, newMoveY);
+                        
+                        // dont move out of the canvas
+                        if (newMoveX < 0) { newMoveX = 0; }
+                        if (newMoveX > 0 && newMoveX + $( "#kannwas" ).colorClash("option", "resizeImg")[0] > $( "#kannwas" ).width()) {
+                            newMoveX = $( "#kannwas" ).width() - $( "#kannwas" ).colorClash("option", "resizeImg")[0]; }
+                           
+                        if (newMoveY < 0) { newMoveY = 0; }
+                        if (newMoveY > 0 && newMoveY + $( "#kannwas" ).colorClash("option", "resizeImg")[1] > $( "#kannwas" ).height()) {
+                            newMoveY = $( "#kannwas" ).height() - $( "#kannwas" ).colorClash("option", "resizeImg")[1]; }
+                        
+                        $( "#kannwas" ).colorClash("option", "moveImg", [newMoveX, newMoveY]);
+                        element.mouseup(function(e) {
+                            element.unbind('mousemove');
+                        });
                     });
-                });
-        
-
+                }
             });
             this.value = "Disable Drag";
             //console.log($( '#kannwas' ).colorClash("option", "moveImg"));
@@ -193,6 +243,102 @@ $(function () {
             element.unbind('mousemove');
             element.unbind('mouseup ');
             this.value = "Enable Drag";
+        }
+    });
+
+    $( "#ResizeWidth" ).slider({
+        value:          0,
+        min:            -100,
+        max:            100,
+        orientation:    "horizontal",
+        animate:        true,
+        stop: function (event, ui) {
+            // resizeImg[newWidth, newHeight]
+            $( '#kannwas' ).colorClash("option", "resizeImg",
+                [$( '#kannwas' ).colorClash("option", "img")[1] + ui.value, $( '#kannwas' ).colorClash("option", "resizeImg")[1]]);
+            //console.log("ResizeWidth", $( '#kannwas' ).colorClash("option", "resizeImg"));
+        }
+    });
+
+    $( "#ResizeHeight" ).slider({
+        value:          0,
+        min:            -100,
+        max:            100,
+        orientation:    "horizontal",
+        animate:        true,
+        stop: function (event, ui) {
+            // resizeImg[newWidth, newHeight]
+            $( '#kannwas' ).colorClash("option", "resizeImg",
+                [$( '#kannwas' ).colorClash("option", "resizeImg")[0], $( '#kannwas' ).colorClash("option", "img")[2] + ui.value]);
+            //console.log("ResizeHeight", $( '#kannwas' ).colorClash("option", "resizeImg"));
+        }
+    });
+
+    var resizeProportional = function (imgWidth, imgHeight, newWidth, newHeight) {
+        // if both old and new values are different than it can't work because you
+        // calculate the proportional newHeight to the changing newWidth or vice versa
+        if ((imgWidth !== newWidth) && (imgHeight !== newHeight)) {
+            alert("Only change the width like \"resizeProportional(800,480, 600, 480);\" or " +
+                "change the height like \"resizeProportional(800,480, 800, 260);\" but don't change both at the same time!");
+        }
+        var ratio = newHeight/newWidth;
+        if (imgHeight/imgWidth > ratio) {
+            // imgHeight is the problem
+            if (imgHeight > newHeight) {
+                imgWidth = Math.round(imgWidth*(newHeight/imgHeight));
+                imgHeight = newHeight;
+                return [imgWidth, imgHeight];
+            } else {
+                imgHeight = Math.round(imgHeight*(newWidth/imgWidth));
+                imgWidth = newWidth;
+                return [imgWidth, imgHeight];
+            }
+        } else {
+            // imgWidth is the problem
+            if (imgWidth > newWidth) {
+                imgHeight = Math.round(imgHeight*(newWidth/imgWidth));
+                imgWidth = newWidth;
+                return [imgWidth, imgHeight];
+            } else {
+                imgWidth = Math.round(imgWidth*(newHeight/imgHeight));
+                imgHeight = newHeight;
+                return [imgWidth, imgHeight];
+            }
+        }
+    };
+
+    $( "#ResizeProportional" ).slider({
+        value:          0,
+        min:            -100,
+        max:            100,
+        orientation:    "horizontal",
+        animate:        true,
+        stop: function (event, ui) {
+            // resizeImg[newWidth, newHeight]
+            var newResize = resizeProportional($( '#kannwas' ).colorClash("option", "img")[1],      //imgWidth
+                                                $( '#kannwas' ).colorClash("option", "img")[2],     //imgHeight
+                                                $( '#kannwas' ).colorClash("option", "img")[1] + ui.value, //newWidth
+                                                $( '#kannwas' ).colorClash("option", "img")[2]);    //newHeight === imgHeight
+            // change the sliders accordingly
+            $( "#ResizeWidth" ).slider( "option", "value",
+                                    newResize[0] - $( '#kannwas' ).colorClash("option", "img")[1]);
+            $( "#ResizeHeight" ).slider( "option", "value",
+                                    newResize[1] - $( '#kannwas' ).colorClash("option", "img")[2]);
+                
+            $( '#kannwas' ).colorClash("option", "resizeImg", newResize);
+            //console.log("ResizeProportional", $( '#kannwas' ).colorClash("option", "resizeImg"));
+        }
+    });
+
+    $( "#Canvasextension" ).slider({
+        value:          0,
+        min:            -200,
+        max:            200,
+        orientation:    "horizontal",
+        animate:        true,
+        stop: function (event, ui) {
+            $( '#kannwas' ).colorClash("option", "canvasExt", [ui.value, ui.value]);
+            //console.log("Canvasextension", $( '#kannwas' ).colorClash("option", "canvasExt"));
         }
     });
 });
@@ -213,15 +359,19 @@ $(function () {
             coloring:           0,
             vertical:           false,
             horizontal:         false,
+            inverse:            false,
             undo:               false,
+            reset:              false,
             imageData:          null,
             img:                null,
             canvasExt:          null,
             moveImg:            null,
+            resizeImg:          null,
 
             // callbacks
             create_cb:          null,
             undo_cb:            null,
+            reset_cb:           null,
             manipulation_cb:    null
         },
 
@@ -240,11 +390,13 @@ $(function () {
         // Set up the widget
         _create: function () {
         ////////////////////
-            this.variables.canvas = this.element[0];
+            this.variables.canvas        = this.element[0];
             this.variables.canvasContext = this.element[0].getContext('2d');
             // create the undoarray which gets destroyed later in the "destroy"-method
-            this.variables.undoArray = [];
-            this.variables.imgArray = [];
+            this.options.moveImg         = [0, 0];
+            this.options.canvasExt       = [0, 0];
+            this.variables.undoArray     = [];
+            this.variables.imgArray      = [];
 
             // create an img as a deep copy which gets destroyed later in the "destroy"-method (imgArray.remove())
             var tempImg = $("<img/>");
@@ -265,12 +417,34 @@ $(function () {
                 self.variables.canvasContext.
                     drawImage(tempImg[0], 0 + self.options.moveImg[0], 0 + self.options.moveImg[1]);
     
-                // get the imagedata
+                // get the original imagedata
                 self.variables.originalImageData = self.variables.canvasContext.
                     getImageData(0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.variables.imgWidth, self.variables.imgHeight);
-                self.options.imageData = self.variables.canvasContext.
-                    getImageData(0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.variables.imgWidth, self.variables.imgHeight);
-    
+                
+                if (self.options.resizeImg !== null) {
+                    // if you have modified the transformation matrix you likely will not be clearing the canvas properly so
+                    // store the current transformation matrix
+                    self.variables.canvasContext.save();
+                    // use the identity matrix while clearing the canvas
+                    self.variables.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
+                    self.variables.canvasContext.clearRect(0, 0, self.variables.canvas.width, self.variables.canvas.height);
+                    // restore the transform
+                    self.variables.canvasContext.restore();
+
+                    self.variables.canvasContext.
+                        drawImage(tempImg[0], 0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.options.resizeImg[0], self.options.resizeImg[1]);
+
+                    self.options.imageData = self.variables.canvasContext.
+                        getImageData(0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.options.resizeImg[0], self.options.resizeImg[1]);
+
+                } else {
+                    self.options.imageData = self.variables.canvasContext.
+                        getImageData(0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.variables.imgWidth, self.variables.imgHeight);
+                    self.options.resizeImg = [];
+                    self.options.resizeImg[0] = self.variables.imgWidth;
+                    self.options.resizeImg[1] = self.variables.imgHeight;
+                }
+                
                 self._flipImg();
                 self._manipulateImg();
                 self._trigger("create_cb");
@@ -338,10 +512,19 @@ $(function () {
                     this._manipulateImg();
                     //console.log("horizontal");
                     return;
+                case "inverse":
+                    this.variables.undoArray.push("inverse", this.options.inverse);
+                    manipulate = true;
+                    //console.log("inverse");
+                    break;
                 case "undo":
                     this.undo(value);
                     manipulate = true;
                     //console.log("undo");
+                    break;
+                case "reset":
+                    this._reset(value);
+                    //console.log("reset");
                     break;
                 case "imageData":
                     this._imageData(value);
@@ -358,30 +541,30 @@ $(function () {
                     //console.log("imgSrc");
                     break;
                 case "canvasExt":
-                    // if the extension is smaller than the width/height of the canvas the
-                    // canvasExt-array contains the values [-imgWidth, -imgHeight]
+                    // if the extension is smaller than, for eg. the width of the canvas the
+                    // canvasExt-array contains the values [-imgWidth, imgHeight]
                     if (value[0] < 0 && this.variables.imgWidth - (-1 * value[0]) < 0 ) { value[0] = -1 * this.variables.imgWidth; }
                     this.variables.canvas.width  = this.variables.imgWidth  + value[0];
                     if (value[1] < 0 && this.variables.imgHeight - (-1 * value[1]) < 0 ) { value[1] = -1 * this.variables.imgHeight; }
                     this.variables.canvas.height = this.variables.imgHeight  + value[1];
+                    manipulate = true;
                     //console.log("canvasExt");
                     break;
                 case "moveImg":
-                    // move an image by absolute positioning, no negative values possible
-                    if (value[0] < 0) { value[0] = 0; }
-                    if (value[0] > 0 && value[0] + this.variables.imgWidth > this.variables.canvas.width) {
-                        value[0] = this.variables.canvas.width - this.variables.imgWidth; }
-                       
-                    if (value[1] < 0) { value[1] = 0; }
-                    if (value[1] > 0 && value[1] + this.variables.imgHeight > this.variables.canvas.height) {
-                        value[1] = this.variables.canvas.height - this.variables.imgHeight; }
-
                     this.variables.canvasContext.clearRect(0, 0, this.variables.canvas.width, this.variables.canvas.height);
-                    this.variables.canvasContext.putImageData(this.options.imageData, 0 + value[0], 0 + value[1]);
+                    this.variables.canvasContext.putImageData(this.options.imageData, value[0], value[1]);
                     //console.log("moveImg");
+                    break;
+                case "resizeImg":
+                    this.variables.undoArray.push("resizeImg", this.options.resizeImg);
+                    this.options.resizeImg = value;
+                    this._resizeImg();
+                    manipulate = true;
+                    //console.log("resizeImg");
                     break;
             }
             $.Widget.prototype._setOption.apply(this, arguments);
+
             if (manipulate === true) {
                 this._manipulateImg();
             }
@@ -390,82 +573,108 @@ $(function () {
         // Undo last action - everything that you can undo should work correctly
         undo: function (value) {
         ////////////////////
-            // getter
-            if (value === undefined) {
-                return this.options.undo;
-            } else {
-            // setter
-                var action = "";
-                this.options.undo = value;
-                
-                if (value) {
-                    
-                    if (this.variables.undoArray.length > 0) {
-                        // get the last action and its value
-                        action = this.variables.undoArray[this.variables.undoArray.length - 2];
-                        value  = this.variables.undoArray[this.variables.undoArray.length - 1];
-                        //console.log(action, value);
-
-                        // set the old value and apply it to the image
-                        if (action === "red") {
-                            this.options.red = value;
-                            this._manipulateImg();
-                        }
-
-                        if (action === "green") {
-                            this.options.green = value;
-                            this._manipulateImg();
-                        }
-
-                        if (action === "blue") {
-                            this.options.blue = value;
-                            this._manipulateImg();
-                        }
-
-                        if (action === "lighten") {
-                            this.options.lighten = value;
-                            this._manipulateImg();
-                        }
-
-                        if (action === "saturate") {
-                            this.options.saturate = value;
-                            this._manipulateImg();
-                        }
-
-                        if (action === "temperature") {
-                            this.options.temperature = value;
-                            this._manipulateImg();
-                        }
-
-                        if (action === "coloring") {
-                            this.options.coloring = value;
-                            this._manipulateImg();
-                        }
-
-                        if (action === "vertical") {
-                            this.options.vertical = value;
-                            this._flipImg();
-                        }
-
-                        if (action === "horizontal") {
-                            this.options.horizontal = value;
-                            this._flipImg();
-                        }
-
-                        if (action === "img") {
-                            this.options.img = value;
-                            this._img(value);
-                        }
-
-                        // the old state is now the current one so delete the last two entries
-                        this.variables.undoArray.pop();
-                        this.variables.undoArray.pop();
+            var action = "";
+            this.options.undo = value;
+            
+            if (value) {
+                if (this.variables.undoArray.length > 0) {
+                    // get the last action and its value
+                    action = this.variables.undoArray[this.variables.undoArray.length - 2];
+                    value  = this.variables.undoArray[this.variables.undoArray.length - 1];
+                    //console.log(action, value);
+                    // set the old value and apply it to the image
+                    if (action === "red") {
+                        this.options.red = value;
+                        this._manipulateImg();
                     }
+                    if (action === "green") {
+                        this.options.green = value;
+                        this._manipulateImg();
+                    }
+                    if (action === "blue") {
+                        this.options.blue = value;
+                        this._manipulateImg();
+                    }
+                    if (action === "lighten") {
+                        this.options.lighten = value;
+                        this._manipulateImg();
+                    }
+                    if (action === "saturate") {
+                        this.options.saturate = value;
+                        this._manipulateImg();
+                    }
+                    if (action === "temperature") {
+                        this.options.temperature = value;
+                        this._manipulateImg();
+                    }
+                    if (action === "coloring") {
+                        this.options.coloring = value;
+                        this._manipulateImg();
+                    }
+                    if (action === "vertical") {
+                        this.options.vertical = value;
+                        this._flipImg();
+                    }
+                    if (action === "horizontal") {
+                        this.options.horizontal = value;
+                        this._flipImg();
+                    }
+                    if (action === "inverse") {
+                        this.options.inverse = value;
+                        this._manipulateImg();
+                    }
+                    if (action === "img") {
+                        this.options.img = value;
+                        this._img(value);
+                    }
+                    if (action === "resizeImg") {
+                        this.options.resizeImg = value;
+                        this._resizeImg(value);
+                    }
+                    // the old state is now the current one so delete the last two entries
+                    this.variables.undoArray.pop();
+                    this.variables.undoArray.pop();
                 }
-                //console.log(this.variables.undoArray);
+            }
+            //console.log(this.variables.undoArray);
+            // ui.name indicates the which action was restored
+            this._trigger("undo_cb", {}, {name: action});
+        },
 
-                // ui.name indicates the which action was restored
-                this._trigger("undo_cb", {}, {name: action});
+        // Reset everything
+        _reset: function(value) {
+        ////////////////////
+            if (value === true) {
+                this.options.red               = 0;
+                this.options.green             = 0;
+                this.options.blue              = 0;
+                this.options.lighten           = 0;
+                this.options.saturate          = 1;
+                this.options.temperature       = 0;
+                this.options.coloring          = 0;
+                this.options.vertical          = false;
+                this.options.horizontal        = false;
+                this.options.inverse           = false;
+                this.options.undo              = false;
+                this.options.reset             = false;
+                this.options.imageData         = null;
+                this.options.img               = this.variables.imgArray[0][0];
+                this.options.canvasExt         = [0, 0];
+                this.options.moveImg           = [0, 0];
+                this.options.resizeImg         = [this.options.img[1], this.options.img[2]];
+    
+                this.variables.curImg            = null;
+                this.variables.imgSrc            = null;
+                this.variables.imgWidth          = null;
+                this.variables.imgHeight         = null;
+                //this.variables.canvas            = null;
+                //this.variables.canvasContext     = null;
+                this.variables.originalImageData = null;
+                this.variables.undoArray         = [];
+                this.variables.imgArray          = [];
+                this._img(this.options.img);
+    
+                this._trigger("reset_cb");
             }
         },
 
@@ -482,7 +691,7 @@ $(function () {
             constR = constG = constB =
             greyscaleIntensity = 0;
             tempSaturate                = this.options.saturate;
-            countOfPixels               = this.variables.imgWidth * this.variables.imgHeight * 4;
+            countOfPixels               = this.options.resizeImg[0] * this.options.resizeImg[1] * 4;
             tempOriginalImageData_data  = this.variables.originalImageData.data;
             tempImageData_data          = this.options.imageData.data;
 
@@ -499,15 +708,21 @@ $(function () {
             constG = this.options.green + this.options.lighten                            - this.options.coloring;
             constB = this.options.blue  + this.options.lighten - this.options.temperature + this.options.coloring;
 
+            // inverse the image by inversing its originalImageData values ogRed 55 => 255 - 55 = 200 newRed
+            var inv = 0, erse = 1;
+            if (this.options.inverse === true) {
+                inv = 255, erse = -1;
+            }
+
             // the while-loop automatically terminates at 0, subtracting 4 on countOfPixels every loop is the
             // most performent way because the while loop checks against an shrinking value and can decide
             // faster whether it reached 0 or not
             while (countOfPixels) {
                 countOfPixels -= 4;
-                
-                newR = tempOriginalImageData_data[countOfPixels]     + constR;
-                newG = tempOriginalImageData_data[countOfPixels + 1] + constG;
-                newB = tempOriginalImageData_data[countOfPixels + 2] + constB;
+
+                newR = inv + erse * tempOriginalImageData_data[countOfPixels]     + constR;
+                newG = inv + erse * tempOriginalImageData_data[countOfPixels + 1] + constG;
+                newB = inv + erse * tempOriginalImageData_data[countOfPixels + 2] + constB;
 
                 // This attempt (different weights for red, green and blue) seems to look "better"
                 // then just averaging the sum of r/g/b (because our eye differs in its sensitivity
@@ -515,32 +730,33 @@ $(function () {
                 greyscaleIntensity = 0.3 * newR + 0.59 * newG + 0.11 * newB;
 
                 // saturate indicates the degree of saturation so 1 - saturation is the value for the desaturation
-                tempImageData_data[countOfPixels]     = greyscaleIntensity * (1 - tempSaturate) + newR * tempSaturate;
-                tempImageData_data[countOfPixels + 1] = greyscaleIntensity * (1 - tempSaturate) + newG * tempSaturate;
-                tempImageData_data[countOfPixels + 2] = greyscaleIntensity * (1 - tempSaturate) + newB * tempSaturate;
+                tempImageData_data[countOfPixels]     = (greyscaleIntensity * (1 - tempSaturate) + newR * tempSaturate);
+                tempImageData_data[countOfPixels + 1] = (greyscaleIntensity * (1 - tempSaturate) + newG * tempSaturate);
+                tempImageData_data[countOfPixels + 2] = (greyscaleIntensity * (1 - tempSaturate) + newB * tempSaturate);
+                
             }
             this.options.imageData.data = tempImageData_data;
             this.variables.canvasContext.
-                putImageData(this.options.imageData, 0 + this.options.moveImg[0], 0 + this.options.moveImg[1]);
+                putImageData(this.options.imageData, 0 + this.options.moveImg[0], 0 + this.options.moveImg[1], 0, 0, this.options.resizeImg[0], this.options.resizeImg[1]);
             this._trigger("manipulation_cb");
         },
 
-        // flip the image
+        // Flip the image
         _flipImg: function() {
         ////////////////////
             // flipping the image is quiet easy (done via scale(ver, hor)) the difficult part is
             // placing the image in the right position after the flipping happend
             var ver = 1,
                 hor = 1,
-                width = this.variables.imgWidth,
-                height = this.variables.imgHeight;
+                width = this.options.resizeImg[0],
+                height = this.options.resizeImg[1];
 
             // there are four different ways (ver, none) (hor, none) (ver, hor) (none,none)
             // caution! there are four IF-Statements (no if-else) so in case of (ver, hor) the first
             // three if-statements return true btw -1 indicates the flipping
             if (this.options.vertical) { ver = -1; height = 0; }
             if (this.options.horizontal) { hor = -1; width = 0; }
-            if (this.options.vertical && this.options.horizontal) { width = this.variables.imgWidth; height = this.variables.imgHeight; }
+            if (this.options.vertical && this.options.horizontal) { width = this.options.resizeImg[0]; height = this.options.resizeImg[1]; }
             if (!this.options.vertical && !this.options.horizontal) { width = 0; height = 0; }
 
             this.variables.canvasContext.save();
@@ -548,10 +764,32 @@ $(function () {
             this.variables.canvasContext.scale(ver, hor);
             this.variables.canvasContext.
                 drawImage(this.variables.curImg[0], (ver * width) + (ver * this.options.moveImg[0]),
-                    (hor * height) + (hor * this.options.moveImg[1]));
+                    (hor * height) + (hor * this.options.moveImg[1]), this.options.resizeImg[0], this.options.resizeImg[1]);
             this.variables.canvasContext.restore();
             this.variables.originalImageData =
-                this.variables.canvasContext.getImageData(0 + this.options.moveImg[0], 0 + this.options.moveImg[1], this.variables.imgWidth, this.variables.imgHeight);
+                this.variables.canvasContext.getImageData(0 + this.options.moveImg[0], 0 + this.options.moveImg[1], this.options.resizeImg[0], this.options.resizeImg[1]);
+        },
+
+        // Resize the image
+        _resizeImg: function () {
+        ////////////////////
+            // if you have modified the transformation matrix you likely will not be clearing the canvas properly so
+            // store the current transformation matrix
+            this.variables.canvasContext.save();
+            // use the identity matrix while clearing the canvas
+            this.variables.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
+            this.variables.canvasContext.clearRect(0, 0, this.variables.canvas.width, this.variables.canvas.height);
+            // restore the transform
+            this.variables.canvasContext.restore();
+
+            this.variables.canvasContext.
+                drawImage(this.variables.curImg[0], 0 + this.options.moveImg[0], 0 + this.options.moveImg[1], this.options.resizeImg[0], this.options.resizeImg[1]);
+            this._flipImg();
+            this.variables.originalImageData = this.variables.canvasContext.
+                getImageData(0 + this.options.moveImg[0], 0 + this.options.moveImg[1], this.options.resizeImg[0], this.options.resizeImg[1]);
+            this.options.imageData = this.variables.canvasContext.
+                getImageData(0 + this.options.moveImg[0], 0 + this.options.moveImg[1], this.options.resizeImg[0], this.options.resizeImg[1]);
+
         },
 
         ////////////////////
@@ -564,7 +802,7 @@ $(function () {
             }
         },
 
-        // apply the new image
+        // Apply the new image
         _img: function (value) {
         ////////////////////
             // check if image was loaded before
@@ -606,13 +844,13 @@ $(function () {
                 self.variables.canvas.width  = self.variables.imgWidth  + self.options.canvasExt[0];
                 self.variables.canvas.height = self.variables.imgHeight + self.options.canvasExt[1];
                 self.variables.canvasContext.
-                    drawImage(tempImg[0], 0 + self.options.moveImg[0], 0 + self.options.moveImg[1]);
+                    drawImage(tempImg[0], 0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.options.resizeImg[0], self.options.resizeImg[1]);
     
                 // get the imagedata
                 self.variables.originalImageData = self.variables.canvasContext.
-                    getImageData(0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.variables.imgWidth, self.variables.imgHeight);
+                    getImageData(0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.options.resizeImg[0], self.options.resizeImg[1]);
                 self.options.imageData = self.variables.canvasContext.
-                    getImageData(0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.variables.imgWidth, self.variables.imgHeight);
+                    getImageData(0 + self.options.moveImg[0], 0 + self.options.moveImg[1], self.options.resizeImg[0], self.options.resizeImg[1]);
     
                 self._flipImg();
                 self._manipulateImg();
@@ -629,6 +867,7 @@ $(function () {
             this.variables.imgArray.remove();
             this.options.canvasExt.remove();
             this.options.moveImg.remove();
+            this.options.resizeImg.remove();
             // unbind Callbacks
             this.element.unbind("create_cb");
             this.element.unbind("undo_cb");

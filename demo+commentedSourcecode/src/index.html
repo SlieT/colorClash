@@ -6,8 +6,8 @@
 <title>colorClash</title>
 </head>
 <body>
-	
-	<link type="text/css" href="css/smoothness/jquery-ui-1.8.19.custom.css" rel="stylesheet" />
+
+	<link type="text/css" href="css/ui-lightness/jquery-ui-1.9.2.custom.min.css" rel="stylesheet"/>
 	<link type="text/css" href="css/colorClash.css" rel="stylesheet" />
 	<script src="http://code.jquery.com/jquery-1.8.3.js"></script>
     <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
@@ -22,34 +22,44 @@
 				<td class="td-slider"><p id="Red"></p></td>
 				<td>Lightness:</td>
 				<td class="td-slider"><p id="Lightness"></p></td>
+				<td>Resize width:</td>
+				<td class="td-slider"><p id="ResizeWidth"></p></td>
 			</tr>
 			<tr>
 				<td>Green:</td>
 				<td class="td-slider"><p id="Green"></p></td>
 				<td>Saturation:</td>
 				<td class="td-slider"><p id="Saturation"></p></td>
+				<td>Resize height:</td>
+				<td class="td-slider"><p id="ResizeHeight"></p></td>
 			</tr>
 			<tr>
 				<td>Blue:</td>
 				<td class="td-slider"><p id="Blue"></p></td>
 				<td>Color:</td>
 				<td class="td-slider"><p id="Color"></p></td>
+				<td>Resize proportional:</td>
+				<td class="td-slider"><p id="ResizeProportional"></p></td>
 			</tr>
 			<tr>
 				<td></td>
 				<td></td>
 				<td>Temperature:</td>
 				<td class="td-slider"><p id="Temperature"></p></td>
-			</tr>
-			<tr>
-				<td><button id="Vertical">		Vertical</button></td>
-				<td><button id="Horizontal">	Horizontal</button></td>
-				<td><button id="Undo">			Undo</button></td>
-				<td><button id="ChangeImg">		ChangeImg</button>
-					<input type="button" id="Drag" value="Enable Drag" style="margin-left: 20px;"></td>
-				
+				<td>Canvasextension:</td>
+				<td class="td-slider"><p id="Canvasextension"></p></td>
 			</tr>
 		</table>
+
+		<div style="position:absolute;">
+			<button id="Vertical">		Vertical</button>
+			<button id="Horizontal">	Horizontal</button>
+			<button id="Inverse">		Inverse</button>
+			<button id="Undo">			Undo</button>
+			<button id="ChangeImg">		ChangeImg</button>
+			<input type="button" id="Drag" value="Enable Drag">
+			<button id="Reset">			Reset</button>
+		</div>
 
 		<canvas id="kannwas"></canvas>	
 	</div>

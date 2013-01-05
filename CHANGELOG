@@ -1,15 +1,24 @@
+v0.3.0
+------
+- the inverse option allows you to invert the colors of the image
+
+- the resize-array was added to resize the image
+
+- the reset option allows you to reset all effects and arrays
+
+
 v0.2.0
 ------
 - the moveImg-array was added to move the image in its canvas
 
 - the canvasWidthExt and canvasHeightExt values got replaced by the canvasExt-array
-		which takes two values [canvasWidthExt, canvasHeight]
+		[canvasWidthExt, canvasHeight]
 
 
 v0.1.1
 ------
 - imgSrc, imgWidth, imgHeight are now part of the (hidden) "variables"-object and "img" is
-		the new option in "options", where "img" is an array [imgSrc, imgWidth, imgHeight].
+		the new option in "options", where "img" is an array ([imgSrc, imgWidth, imgHeight]).
 
 - the image is now shown as soon as it's loaded and stored in the imgArray for faster reuse.
 
